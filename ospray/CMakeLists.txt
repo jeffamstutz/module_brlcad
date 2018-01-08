@@ -22,5 +22,5 @@ ospray_create_library(ospray_module_brlcad
   ospray
 )
 
-target_include_directories(ospray_module_brlcad PRIVATE ${BRLCAD_INCLUDE_DIR})
+target_include_directories(ospray_module_brlcad PRIVATE ${BRLCAD_INCLUDE_DIRS})
 target_link_libraries(ospray_module_brlcad ${BRLCAD_LIBRARIES})

@@ -26,7 +26,7 @@ find_path(BRLCAD_ROOT include/brlcad/bu.h
     /usr/brlcad
 )
 
-find_path(BRLCAD_INCLUDE_DIR brlcad/bu.h PATHS ${BRLCAD_ROOT}/include NO_DEFAULT_PATH)
+find_path(BRLCAD_INCLUDE_DIR bu.h PATHS ${BRLCAD_ROOT}/include/brlcad NO_DEFAULT_PATH)
 find_library(BRLCAD_BU_LIBRARY bu PATHS ${BRLCAD_ROOT}/lib NO_DEFAULT_PATH)
 find_library(BRLCAD_BN_LIBRARY bn PATHS ${BRLCAD_ROOT}/lib NO_DEFAULT_PATH)
 find_library(BRLCAD_RT_LIBRARY rt PATHS ${BRLCAD_ROOT}/lib NO_DEFAULT_PATH)
@@ -41,10 +41,11 @@ find_package_handle_standard_args(BRLCAD
 )
 
 if (BRLCAD_FOUND)
+  set(BRLCAD_INCLUDE_DIRS ${BRLCAD_INCLUDE_DIR}/.. ${BRLCAD_INCLUDE_DIR})
   set(BRLCAD_LIBRARIES ${BRLCAD_BU_LIBRARY} ${BRLCAD_BN_LIBRARY} ${BRLCAD_RT_LIBRARY})
 endif()
 
-mark_as_advanced(BRLCAD_INCLUDE_DIR)
+mark_as_advanced(BRLCAD_INCLUDE_DIRS)
 mark_as_advanced(BRLCAD_BU_LIBRARY)
 mark_as_advanced(BRLCAD_BN_LIBRARY)
 mark_as_advanced(BRLCAD_RT_LIBRARY)
