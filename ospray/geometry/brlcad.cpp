@@ -37,12 +37,17 @@ namespace ospray {
 
     void BRLCAD::commit()
     {
-      //TODO
+      //TODO:
+      //  - get a .g filename to open
+      //  - get a list of object names to be intersected
+      //  - materials?
     }
 
     void BRLCAD::finalize(Model *model)
     {
-      //TODO
+      //TODO:
+      //  - Embree bounds/intersect callbacks
+      //  - create Embree UDG
     }
 
     OSP_REGISTER_GEOMETRY(BRLCAD, brlcad);
