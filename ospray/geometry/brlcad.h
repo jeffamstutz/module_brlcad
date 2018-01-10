@@ -49,6 +49,8 @@ namespace ospray {
 
       application ap;
       rt_i *rtip {nullptr};
+
+      mutable std::vector<resource> resources;
     };
 
   } // ::ospray::brlcad

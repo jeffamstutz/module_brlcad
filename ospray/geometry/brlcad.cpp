@@ -21,8 +21,29 @@
 #include "ospray/common/Model.h"
 #include "ospray/common/Ray.h"
 
+#include "ospcommon/tasking/tasking_system_handle.h"
+
+#include <atomic>
+#include <thread>
+#include <unordered_map>
+
 namespace ospray {
   namespace brlcad {
+
+    static inline int getCpuId()
+    {
+      static std::unordered_map<std::thread::id, int> threadIds;
+      static std::atomic<int> nextId{1};
+
+      const auto currentThread = std::this_thread::get_id();
+
+      auto id = threadIds[currentThread];
+
+      if (id == 0)
+        threadIds[currentThread] = id = nextId++;
+
+      return id - 1;
+    }
 
     // Local helper functions /////////////////////////////////////////////////
 
@@ -150,6 +171,8 @@ namespace ospray {
       ap.a_rt_i = geom.rtip;
       ap.a_onehit = 1;
 
+      ap.a_resource = &geom.resources[getCpuId()];
+
       VSET(ap.a_ray.r_pt, ray.org[0], ray.org[1], ray.org[2]);
       VSET(ap.a_ray.r_dir, ray.dir[0], ray.dir[1], ray.dir[2]);
       ap.a_ray.r_min = ray.tnear;
@@ -234,6 +257,10 @@ namespace ospray {
 
       if (rtip == nullptr)
         throw std::runtime_error("BRLCAD geometry requires an existing rt_i!");
+
+      resources.resize(tasking::numTaskingThreads());
+      for (auto &r : resources)
+        rt_init_resource(&r, 1, rtip);
 
       bounds.lower.x = rtip->mdl_min[0];
       bounds.lower.y = rtip->mdl_min[1];

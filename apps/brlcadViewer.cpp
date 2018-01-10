@@ -54,13 +54,9 @@ namespace ospray {
 
     rt_i *loadBrlcadGeometry(std::string filename, std::string object)
     {
-      PING;
       auto *rtip = rt_dirbuild(filename.c_str(), nullptr, 0);
-      PING;
       rt_gettree(rtip, object.c_str());
-      PING;
       rt_prep_parallel(rtip, tasking::numTaskingThreads());
-      PING;
       return rtip;
     }
 
