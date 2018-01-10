@@ -34,7 +34,9 @@ static void BRLCAD_postIntersect(uniform Geometry *uniform geometry,
                                  const varying Ray &ray,
                                  uniform int64 flags)
 {
+#if 0
   BRLCAD *uniform self = (BRLCAD *uniform)geometry;
+#endif
   dg.Ng = dg.Ns = normalize(ray.Ng);
 
   if (flags & DG_MATERIALID) {

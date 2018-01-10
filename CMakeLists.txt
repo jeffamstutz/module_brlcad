@@ -16,9 +16,11 @@
 
 option(OSPRAY_MODULE_BRLCAD "Build BRLCAD module" OFF)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-
 if (OSPRAY_MODULE_BRLCAD)
+  list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
   find_package(brlcad REQUIRED)
+
+  add_subdirectory(apps)
   add_subdirectory(ospray)
 endif (OSPRAY_MODULE_BRLCAD)

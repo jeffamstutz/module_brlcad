@@ -21,6 +21,14 @@
 
 #include "ospray/geometry/Geometry.h"
 
+#undef UNUSED
+#undef _USE_MATH_DEFINES
+#include "brlcad/common.h"
+#include "brlcad/vmath.h"		/* vector math macros */
+#include "brlcad/raytrace.h"	/* librt interface definitions */
+
+#include "embree2/rtcore_ray.h"
+
 namespace ospray {
   namespace brlcad {
 
@@ -37,7 +45,10 @@ namespace ospray {
 
       // Data members //
 
-      //TODO
+      uint geomID {0};
+
+      application ap;
+      rt_i *rtip {nullptr};
     };
 
   } // ::ospray::brlcad

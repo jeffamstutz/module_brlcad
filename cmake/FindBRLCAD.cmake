@@ -55,7 +55,7 @@ if (BRLCAD_FOUND)
   )
 endif()
 
-mark_as_advanced(BRLCAD_INCLUDE_DIRS)
+mark_as_advanced(BRLCAD_INCLUDE_DIR)
 mark_as_advanced(BRLCAD_BU_LIBRARY)
 mark_as_advanced(BRLCAD_BN_LIBRARY)
 mark_as_advanced(BRLCAD_ON_LIBRARY)

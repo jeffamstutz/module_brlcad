@@ -14,13 +14,18 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
-ospray_create_library(ospray_module_brlcad
-  geometry/brlcad.cpp
-  geometry/brlcad.ispc
-  moduleInit.cpp
+ospray_disable_compiler_warnings()
+
+ospray_create_application(ospBrlcadViewer
+  brlcadViewer.cpp
   LINK
   ospray
+  ospray_common
+  ospray_imgui3d_sg
+  ospray_sg
+  ${OPENGL_LIBRARIES}
+  ${GLUT_LIBRARIES}
   ${BRLCAD_LIBRARIES}
 )
 
-target_include_directories(ospray_module_brlcad PRIVATE ${BRLCAD_INCLUDE_DIRS})
+target_include_directories(ospBrlcadViewer PRIVATE ${BRLCAD_INCLUDE_DIRS})
