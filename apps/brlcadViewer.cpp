@@ -35,6 +35,7 @@ namespace ospray {
 
     std::string filename;
     std::string objects;
+    std::string rendererType = "raycast";
 
     struct BrlcadSGNode : public sg::Geometry
     {
@@ -83,6 +84,8 @@ namespace ospray {
           filename = av[++i];
         } else if (arg == "-o" || arg == "--objects") {
           objects = av[++i];
+        } else if (arg == "-r" || arg == "--renderer") {
+          rendererType = av[++i];
         }
       }
     }
@@ -125,8 +128,6 @@ namespace ospray {
       auto &win_size = ospray::imgui3D::ImGui3DWidget::defaultInitSize;
       renderer["frameBuffer"]["size"] = win_size;
 
-      renderer["rendererType"] = std::string("raycast");
-
       auto &world = renderer["world"];
 
       auto &brlcadInstance = world.createChild("brlcad_instance", "Instance");
@@ -151,6 +152,8 @@ namespace ospray {
       brlcadGeometryNode->createChild("objects", "string", objects);
 
       brlcadInstance["model"].add(brlcadGeometryNode);
+
+      renderer["rendererType"] = rendererType;
 
       ospray::ImGuiViewer window(renderer_ptr);
 
