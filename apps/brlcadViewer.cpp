@@ -162,7 +162,7 @@ namespace ospray {
 
       renderer["camera"]["dir"] = dir;
       renderer["camera"]["pos"] = viewPort.from;
-      renderer["camera"]["up"]  = viewPort.up;
+      renderer["camera"]["up"]  = viewPort.up = vec3f(0.f, 0.f, 1.f);
       renderer["camera"]["fovy"] = viewPort.openingAngle;
       renderer["camera"]["apertureRadius"] = viewPort.apertureRadius;
       if (renderer["camera"].hasChild("focusdistance"))
