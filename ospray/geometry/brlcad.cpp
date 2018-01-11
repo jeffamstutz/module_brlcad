@@ -271,9 +271,10 @@ namespace ospray {
       if (rtip == nullptr)
         throw std::runtime_error("BRLCAD geometry requires an existing rt_i!");
 
-      resources.resize(tasking::numTaskingThreads());
-      for (auto &r : resources)
-        rt_init_resource(&r, 1, rtip);
+      const int nThreads = tasking::numTaskingThreads();
+      resources.resize(nThreads);
+      for (int i = 0; i <  nThreads; ++i)
+        rt_init_resource(&resources[i], i, rtip);
 
       bounds.lower.x = rtip->mdl_min[0];
       bounds.lower.y = rtip->mdl_min[1];
