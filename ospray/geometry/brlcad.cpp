@@ -22,6 +22,7 @@
 #include "ospray/common/Ray.h"
 
 #include "ospcommon/tasking/tasking_system_handle.h"
+#include "ospcommon/utility/StringManip.h"
 
 #include <atomic>
 #include <thread>
@@ -253,7 +254,19 @@ namespace ospray {
 
     void BRLCAD::commit()
     {
-      rtip = (rt_i*)getParamData("brlcad_handle")->data;
+      if (rtip)
+        rt_free_rti(rtip);
+
+      std::string filename = getParamString("filename");
+      std::string objects  = getParamString("objects");
+
+      rtip = rt_dirbuild(filename.c_str(), nullptr, 0);
+
+      auto objNames = ospcommon::split(objects, ',');
+      for (const auto &obj : objNames)
+        rt_gettree(rtip, obj.c_str());
+
+      rt_prep_parallel(rtip, tasking::numTaskingThreads());
 
       if (rtip == nullptr)
         throw std::runtime_error("BRLCAD geometry requires an existing rt_i!");

@@ -51,6 +51,8 @@ namespace ospray {
       rt_i *rtip {nullptr};
 
       mutable std::vector<resource> resources;
+
+      std::vector<std::string> objects;
     };
 
   } // ::ospray::brlcad

@@ -22,6 +22,7 @@
 #include "exampleViewer/widgets/imguiViewer.h"
 
 #include "ospcommon/tasking/tasking_system_handle.h"
+#include "ospcommon/utility/StringManip.h"
 
 #undef UNUSED
 #undef _USE_MATH_DEFINES
@@ -33,7 +34,7 @@ namespace ospray {
   namespace brlcad {
 
     std::string filename;
-    std::string object;
+    std::string objects;
 
     struct BrlcadSGNode : public sg::Geometry
     {
@@ -52,10 +53,24 @@ namespace ospray {
 
     using namespace ospcommon;
 
-    rt_i *loadBrlcadGeometry(std::string filename, std::string object)
+    rt_i *loadBrlcadGeometry(std::string filename, std::string objects)
     {
+      if (filename.empty()) {
+        throw std::runtime_error("No input filename provided!"
+                                 " Use '-g [filename]' to specify the file.");
+      }
+
       auto *rtip = rt_dirbuild(filename.c_str(), nullptr, 0);
-      rt_gettree(rtip, object.c_str());
+      auto objNames = ospcommon::split(objects, ',');
+
+      if (objNames.empty()) {
+        throw std::runtime_error("No objects provided! Use '-o [objects]' with"
+                                 " a comma separated list of object names.");
+      }
+
+      for (const auto &obj : objNames)
+        rt_gettree(rtip, obj.c_str());
+
       rt_prep_parallel(rtip, tasking::numTaskingThreads());
       return rtip;
     }
@@ -66,8 +81,8 @@ namespace ospray {
         const std::string arg = av[i];
         if (arg == "-g" || arg == "--geometry") {
           filename = av[++i];
-        } else if (arg == "-o" || arg == "--object") {
-          object = av[++i];
+        } else if (arg == "-o" || arg == "--objects") {
+          objects = av[++i];
         }
       }
     }
@@ -121,7 +136,7 @@ namespace ospray {
       brlcadGeometryNode->setType("BrlcadSGNode");
 
       parseCommandLine(ac, av);
-      auto *brlcadGeom = loadBrlcadGeometry(filename, object);
+      auto *brlcadGeom = loadBrlcadGeometry(filename, objects);
 
       brlcadGeometryNode->brlcadBounds.lower.x = brlcadGeom->mdl_min[0];
       brlcadGeometryNode->brlcadBounds.lower.y = brlcadGeom->mdl_min[1];
@@ -130,11 +145,11 @@ namespace ospray {
       brlcadGeometryNode->brlcadBounds.upper.y = brlcadGeom->mdl_max[1];
       brlcadGeometryNode->brlcadBounds.upper.z = brlcadGeom->mdl_max[2];
 
-      auto brlcadDataNode =
-          std::make_shared<sg::DataArrayRAW>((byte_t*)brlcadGeom, 1, false);
-      brlcadDataNode->setName("brlcad_handle");
-      brlcadDataNode->setType("DataArrayRAW");
-      brlcadGeometryNode->add(brlcadDataNode);
+      rt_free_rti(brlcadGeom);
+
+      brlcadGeometryNode->createChild("filename", "string", filename);
+      brlcadGeometryNode->createChild("objects", "string", objects);
+
       brlcadInstance["model"].add(brlcadGeometryNode);
 
       ospray::ImGuiViewer window(renderer_ptr);
