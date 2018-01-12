@@ -62,7 +62,7 @@ namespace ospray {
       }
 
       auto *rtip = rt_dirbuild(filename.c_str(), nullptr, 0);
-      auto objNames = ospcommon::split(objects, ',');
+      auto objNames = utility::split(objects, ',');
 
       if (objNames.empty()) {
         throw std::runtime_error("No objects provided! Use '-o [objects]' with"

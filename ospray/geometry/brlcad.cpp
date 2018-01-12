@@ -262,7 +262,7 @@ namespace ospray {
 
       rtip = rt_dirbuild(filename.c_str(), nullptr, 0);
 
-      auto objNames = ospcommon::split(objects, ',');
+      auto objNames = ospcommon::utility::split(objects, ',');
       for (const auto &obj : objNames)
         rt_gettree(rtip, obj.c_str());
 
