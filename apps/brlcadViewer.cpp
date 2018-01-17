@@ -118,17 +118,17 @@ namespace ospray {
       loadLibrary("ospray_sg");
       ospLoadModule("brlcad");
 
-      ospray::imgui3D::init(&ac,av);
-
       box3f worldBounds;
 
       auto renderer_ptr = sg::createNode("renderer", "Renderer");
       auto &renderer = *renderer_ptr;
 
-      auto &win_size = ospray::imgui3D::ImGui3DWidget::defaultInitSize;
-      renderer["frameBuffer"]["size"] = win_size;
+      renderer["frameBuffer"]["size"] = vec2i(1024, 768);
+      renderer["rendererType"] = rendererType;
 
       auto &world = renderer["world"];
+
+      // Load BRLCAD geometry and create BRLCAD geometry scenegraph node
 
       auto &brlcadInstance = world.createChild("brlcad_instance", "Instance");
 
@@ -153,20 +153,31 @@ namespace ospray {
 
       brlcadInstance["model"].add(brlcadGeometryNode);
 
-      renderer["rendererType"] = rendererType;
+      // Calculate sensible default camera position
+
+      auto bbox = brlcadGeometryNode->brlcadBounds;
+      vec3f diag = bbox.size();
+      diag = max(diag, vec3f(0.3f * length(diag)));
+
+      auto gaze = ospcommon::center(bbox);
+      auto pos = gaze - .75f * vec3f(-.6*diag.x, -1.2f*diag.y, .8f*diag.z);
+      auto up = vec3f(0.f, 0.f, 1.f);
+
+      auto &camera = renderer["camera"];
+      camera["pos"] = pos;
+      camera["dir"] = normalize(gaze - pos);
+      camera["up"] = up;
+      camera.createChild("gaze", "vec3f", gaze);
+
+      // Create window and launch app
 
       ospray::ImGuiViewer window(renderer_ptr);
 
       auto &viewPort = window.viewPort;
       auto dir = normalize(viewPort.at - viewPort.from);
 
-      renderer["camera"]["dir"] = dir;
-      renderer["camera"]["pos"] = viewPort.from;
-      renderer["camera"]["up"]  = viewPort.up = vec3f(0.f, 0.f, 1.f);
-      renderer["camera"]["fovy"] = viewPort.openingAngle;
-      renderer["camera"]["apertureRadius"] = viewPort.apertureRadius;
       if (renderer["camera"].hasChild("focusdistance"))
-        renderer["camera"]["focusdistance"] = length(viewPort.at - viewPort.from);
+        renderer["camera"]["focusdistance"] = length(viewPort.at-viewPort.from);
 
       window.create("OSPRay BRLCAD Viewer App");
 
