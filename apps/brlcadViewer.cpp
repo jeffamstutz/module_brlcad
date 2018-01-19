@@ -124,7 +124,6 @@ namespace ospray {
       auto &renderer = *renderer_ptr;
 
       renderer["frameBuffer"]["size"] = vec2i(1024, 768);
-      renderer["rendererType"] = rendererType;
 
       auto &world = renderer["world"];
 
@@ -152,6 +151,8 @@ namespace ospray {
       brlcadGeometryNode->createChild("objects", "string", objects);
 
       brlcadInstance["model"].add(brlcadGeometryNode);
+
+      renderer["rendererType"] = rendererType;
 
       // Calculate sensible default camera position
 
