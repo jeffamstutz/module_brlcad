@@ -24,7 +24,7 @@
 #include "ospcommon/tasking/tasking_system_handle.h"
 #include "ospcommon/utility/StringManip.h"
 
-#include <atomic>
+#include <mutex>
 #include <thread>
 #include <unordered_map>
 
@@ -34,14 +34,17 @@ namespace ospray {
     static inline int getCpuId()
     {
       static std::unordered_map<std::thread::id, int> threadIds;
-      static std::atomic<int> nextId{1};
+      static int nextId{1};
+      static std::mutex idMutex;
 
       const auto currentThread = std::this_thread::get_id();
 
       auto id = threadIds[currentThread];
 
-      if (id == 0)
+      if (id == 0) {
+        SCOPED_LOCK(idMutex);
         threadIds[currentThread] = id = nextId++;
+      }
 
       return id - 1;
     }
@@ -49,7 +52,7 @@ namespace ospray {
     // Local helper functions /////////////////////////////////////////////////
 
     template<typename T>
-    inline static void getRay(const T& rays, RTCRay &ray, int i)
+    inline static void extractRay(const T& rays, RTCRay &ray, int i)
     {
       ray.org[0] = rays.orgx[i];
       ray.org[1] = rays.orgy[i];
@@ -71,7 +74,7 @@ namespace ospray {
     }
 
     template<typename T>
-    inline static void setRay(const RTCRay& ray, T &rays, int i)
+    inline static void insertRay(const RTCRay& ray, T &rays, int i)
     {
       if (ray.geomID != RTC_INVALID_GEOMETRY_ID) {
         rays.Ngx[i] = ray.Ng[0];
@@ -208,9 +211,9 @@ namespace ospray {
       for (int i = 0; i < N; ++i) {
         if (valid[i]) {
           RTCRay ray;
-          getRay(*rays, ray, i);
+          extractRay(*rays, ray, i);
           traceRay(geom, ray);
-          setRay(ray, *rays, i);
+          insertRay(ray, *rays, i);
         }
       }
     }
