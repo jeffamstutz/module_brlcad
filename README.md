@@ -12,5 +12,5 @@ Run ospBrlcadViewer with:
 
 ./ospBrlcadViewer -g [path/to/.g/file] -o [comma,separated,list,of,objects]
 
-NOTE: At the moment, having a large number of threads running causes BRLCAD to crash, thus it is recommended to use '--osp:numthreads [num_threads]' command line option to reduce the number of threads until BRLCAD is more robust.
+NOTE: At the moment, there seems to be a non-deterministic crash during BRLCAD initialization. Occasionally the viewer will work, but sometimes it will crash. Crashes seem more likely at higher CPU thread counts.
 
